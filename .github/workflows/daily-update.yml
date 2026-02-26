@@ -2,16 +2,21 @@ name: Daily DevSync Update
 
 on:
   schedule:
-    - cron: '15 2 * * *'   # Runs daily at 02:15 UTC
-  workflow_dispatch:       # Allows manual run for testing
+    - cron: '15 2 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # 🔥 THIS IS REQUIRED
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true   # 🔥 IMPORTANT
 
       - name: 24f2008196@ds.study.iitm.ac.in - Create daily update
         run: |
@@ -19,8 +24,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "24f2008196@ds.study.iitm.ac.in"
+          git config user.name "github-actions"
+          git config user.email "24f2008196@ds.study.iitm.ac.in"
           git add daily-log.txt
-          git commit -m "Daily automated update"
+          git commit -m "Daily automated update" || echo "No changes"
           git push
